@@ -19,9 +19,6 @@ Before writing any code, replace these placeholders:
 | `{{DisplayFontName}}` | Heading/display font PostScript prefix | PlayfairDisplaySC |
 | `{{BrandPrimary}}` | Primary brand hex | #6D0000 |
 | `{{BrandAccent}}` | Accent brand hex | #810100 |
-| `{{SupabaseURL}}` | Supabase project URL | https://xxx.supabase.co |
-| `{{SupabaseAnonKey}}` | Supabase anon/public key | eyJhbGc... |
-| `{{AnalyticsKey}}` | Amplitude (or other) API key | abc123 |
 | `{{ColorScheme}}` | Forced color scheme | .light |
 
 ---
