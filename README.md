@@ -13,6 +13,8 @@ A prescriptive skill file that teaches Claude Code how to build beautiful, produ
 - **Networking** — Supabase client setup, API config, generic file cache
 - **Animation** — State transitions, looping animations, staggered cascades
 - **Haptics** — Feedback on every tappable element
+- **Build Verification** — `run.sh` workflow to build and launch on the simulator after every change
+- **Structured Logging** — Never `print()`, always use `os.Logger` or a custom `Log` enum
 
 ## How to Use
 

@@ -1,6 +1,14 @@
 # Beautiful iOS Apps — SwiftUI Design System & Architecture
 
-> **What this is**: A prescriptive skill file for building beautiful, production-quality SwiftUI iOS apps. Drop it into your project root as `CLAUDE.md` and Claude Code will follow your design system, architecture patterns, and component conventions automatically.
+> **Purpose**: This document captures the transferable, reusable patterns for building an iOS app with this stack. Don't follow it prescriptively — adapt it suit your app needs, design system and architecture. Claude code should be able to modify from this spec.
+>
+> **Stack**:
+> - SwiftUI-first for all views. UIKit only for complex/legacy layouts or when SwiftUI has known limitations.
+> - `@Observable` + `@Environment` state management. Sheet-based navigation.
+> - iOS `{{DeploymentTarget}}` deployment target.
+> - Never use raw values — always semantic tokens.
+> - Haptics on every tappable action.
+> - Never `print()` — use a structured logger (e.g., `os.Logger` or a custom `Log` enum).
 >
 > **How to use it**: Replace every `{{placeholder}}` with your project's values. Everything else applies as-is. The goal is that Claude never writes a raw hex color, a raw font size, or a raw spacing number — everything goes through your design tokens.
 
@@ -23,6 +31,48 @@ Before writing any code, replace these placeholders:
 
 ---
 
+## 0b. Build & Run Verification
+
+> After implementing any feature, bug fix, or UI change, run `./scripts/run.sh`. If it fails, fix compile errors before the task is done. Do not skip this step.
+
+**Scaffolding**: If `./scripts/run.sh` does not exist, create it before your first build. The script must:
+1. Build the app with `xcodebuild`
+2. Launch on the iOS Simulator
+
+**Reference `run.sh` template** (adapt `SCHEME` and `SIMULATOR` to your project):
+
+```bash
+#!/bin/bash
+set -euo pipefail
+
+SCHEME="{{AppName}}"
+SIMULATOR="iPhone 16 Pro"
+DESTINATION="platform=iOS Simulator,name=$SIMULATOR"
+
+# Boot simulator if needed
+xcrun simctl boot "$SIMULATOR" 2>/dev/null || true
+
+# Build
+xcodebuild -scheme "$SCHEME" \
+  -destination "$DESTINATION" \
+  -derivedDataPath .build \
+  build | xcpretty || exit 1
+
+# Install & launch
+APP_PATH=$(find .build -name "*.app" -path "*/Debug-iphonesimulator/*" | head -1)
+xcrun simctl install booted "$APP_PATH"
+BUNDLE_ID=$(defaults read "$APP_PATH/Info.plist" CFBundleIdentifier)
+xcrun simctl launch booted "$BUNDLE_ID"
+
+echo "✅ Running $SCHEME on $SIMULATOR"
+```
+
+**Note for CLAUDE.md users**: Add this to your project's `CLAUDE.md` so Claude Code picks it up automatically:
+
+> `After implementing any feature or fix, run ./scripts/run.sh to build and launch on the simulator. Do not skip this step.`
+
+---
+
 ## 1. Philosophy
 
 - **SwiftUI-first** for all views. No UIKit unless SwiftUI has a known limitation.
@@ -32,6 +82,7 @@ Before writing any code, replace these placeholders:
 - **Optimistic local state.** Update UI immediately, persist async.
 - **Sheet-based navigation.** No `NavigationLink` push navigation. Sheets + `@Environment(\.dismiss)`.
 - **Pick one color scheme and force it** at the app root: `.preferredColorScheme({{ColorScheme}})`. Supporting both light and dark mode is a significant design undertaking — your brand colors, semantic tokens, and component styles all need conditional variants. Ship with one mode first. You can always add the other later once the design system is mature.
+- **Never `print()`** — use a structured logger (e.g., `os.Logger` or a custom `Log` enum).
 - **Kingfisher** for all remote images. Never raw `AsyncImage`.
 
 ---
